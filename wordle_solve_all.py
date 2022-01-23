@@ -1,5 +1,7 @@
 # coding=utf-8
 from collections import defaultdict
+import time
+from datetime import timedelta
 
 ANSWERS = open('wordle_answers.txt').read().split('\n')
 GUESSES = open('wordle_guesses.txt').read().split('\n') + ANSWERS
@@ -48,7 +50,7 @@ def best_guess(answer):
     answers = ANSWERS
     guess = 'trace'
     round = 0
-    while len(answers) > 1:
+    while guess != answer:
         round += 1
         print(f"{guess}", end=",")
         ans_bucket = calc_bucket(answer, guess)
@@ -84,5 +86,9 @@ def best_guess(answer):
     print(f"{answer}")
 
 if __name__ == '__main__':
+    # kill_answers()
+    start_time = time.time()
+    # print(f'Working on {g1} {str(timedelta(seconds=time.time() - start_time))} Remaining: {time_remaining}')
     for a in ANSWERS:
         best_guess(a)
+    print(str(timedelta(seconds=(time.time() - start_time))))
