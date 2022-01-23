@@ -1,22 +1,24 @@
 # coding=utf-8
-from collections import defaultdict
 import time
+
+from collections import defaultdict
 from datetime import timedelta
+from functools import cache
 
 ANSWERS = open('wordle_answers.txt').read().split('\n')
 GUESSES = open('wordle_guesses.txt').read().split('\n') + ANSWERS
 
 
 def calc_bucket(a, g):
-    # print('An', a, 'Guess', g)
     a = list(a)
     g = list(g)
     bucket = ['-', '-', '-', '-', '-']
     for i in range(5):
-        if g[i] == a[i]:
-            bucket[i] = 'g'
-            g[i] = '.'
-            a[i] = '_'
+        if g[i] != a[i]:
+            continue
+        bucket[i] = 'g'
+        g[i] = '.'
+        a[i] = '_'
     for i in range(5):
         for j in range(5):
             if g[i] == a[j]:
@@ -25,8 +27,9 @@ def calc_bucket(a, g):
 
     return ''.join(bucket)
 
+
+@cache
 def buckets(guess, answers):
-    # print(guess)
     guess_buckets = defaultdict(int)
     for a in answers:
         bucket = calc_bucket(a, guess)
@@ -43,8 +46,8 @@ def buckets(guess, answers):
             two_guesses += 1
         total_val += 1 / value
 
-    # print(guess_buckets)
     return two_guesses, largest_bucket, total_val
+
 
 def best_guess(answer):
     answers = ANSWERS
@@ -66,7 +69,7 @@ def best_guess(answer):
         best_guess_val = 0
         smallest_large = 1000
         for g in range(len(GUESSES)):
-            val, large, total_val = buckets(GUESSES[g], answers)
+            val, large, total_val = buckets(GUESSES[g], tuple(answers))
             if total_val > best_guess_val:
                 best_guess_val = total_val
                 best_guess_tot = GUESSES[g]
